@@ -1,2 +1,2 @@
 # Site ProServiços
-Ainda em desenvolvimento.
+Desenvolvido com React. Nesse primeiro estágio, não apresenta backend.
