@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Home from './pages/Home';
 import Prestadores from './pages/Prestadores';
 import Gerenciamento from './pages/Gerenciamento';
+import LoginAdm from './pages/LoginAdm';
+import LoginCliente from './pages/LoginCliente';
 
 import dadosIniciais from './data/dados.json';
 import './App.css';
@@ -12,12 +14,20 @@ function App() {
   const [dados, setDados] = useState({ servicos: [], prestadores: [], contratos: [], avaliacoes: [] });
   const [menuAberto, setMenuAberto] = useState(false);
 
+  const ehAdmin = localStorage.getItem('usuarioRegra') === 'admin';
+
   useEffect(() => {
     setDados(dadosIniciais);
   }, []);
 
   const fecharMenu = () => {
     setMenuAberto(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('usuarioRegra');
+    fecharMenu();
+    window.location.href = '/'; 
   };
 
   return (
@@ -44,6 +54,24 @@ function App() {
               <Link to="/" onClick={fecharMenu}>Início</Link>
               <Link to="/prestadores" onClick={fecharMenu}>Prestadores</Link>
               <Link to="/gerenciamento" onClick={fecharMenu}>Gerenciamento</Link>
+
+              {ehAdmin && (
+                <button 
+                  onClick={handleLogout} 
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#dc3545',
+                    cursor: 'pointer',
+                    fontSize: 'inherit',
+                    fontFamily: 'inherit',
+                    padding: '0',
+                    textAlign: 'left'
+                  }}
+                >
+                  Sair
+                </button>
+              )}
             </nav>
           </div>
         </header>
@@ -53,6 +81,8 @@ function App() {
             <Route path="/" element={<Home servicos={dados.servicos} />} />
             <Route path="/prestadores" element={<Prestadores prestadores={dados.prestadores} servicos={dados.servicos} />} />
             <Route path="/gerenciamento" element={<Gerenciamento />} />
+            <Route path="/login-adm" element={<LoginAdm />} />
+            <Route path="/login-cliente" element={<LoginCliente />} />
           </Routes>
         </main>
 

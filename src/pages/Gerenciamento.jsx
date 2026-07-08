@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import dadosIniciais from '../data/dados.json';
 
 function Gerenciamento() {
+
+  const ehAdmin = localStorage.getItem('usuarioRegra') === 'admin';
+
   const [contratos, setContratos] = useState([]);
   const [avaliacoes, setAvaliacoes] = useState([]);
 
@@ -24,6 +27,7 @@ function Gerenciamento() {
     setAvaliacoes(dadosIniciais.avaliacoes || []);
   }, []);
 
+  // TODAS AS FUNÇÕES DE LOGICA DO COMPONENTE
   const obterNomeServico = (id) => {
     const servico = dadosIniciais.servicos.find(s => s.id === id);
     return servico ? servico.nome : 'Serviço não encontrado';
@@ -74,7 +78,7 @@ function Gerenciamento() {
       );
 
       setContratos(listaAtualizada);
-      alert('Contrato atualizado com sucesso!');
+      alert('Contrato updated com sucesso!');
     } else {
       const novoContrato = {
         id: contratos.length > 0 ? Math.max(...contratos.map(c => c.id)) + 1 : 501,
@@ -206,12 +210,58 @@ function Gerenciamento() {
       };
     })
   ];
-    const formatarData = (data) => {
-    if (!data || data === '-') return '-';
 
+  const formatarData = (data) => {
+    if (!data || data === '-') return '-';
     const [ano, mes, dia] = data.split('-');
     return `${dia}-${mes}-${ano}`;
   };
+
+  // Usuário não logado
+  if (!ehAdmin) {
+    return (
+      <div className="container-visitante" style={{ padding: '40px', textAlign: 'center' }}>
+        <div className="breadcrumb">
+          <Link to="/">Início</Link>
+          <span>›</span>
+          <span>Gerenciamento</span>
+        </div>
+        
+        <section className="titulo-padrao" style={{ marginTop: '20px' }}>
+          <h3>Área de Recursos</h3>
+          <p>Você precisa estar logado como Administrador para acessar esta área</p>
+          
+          <div style={{ 
+            marginTop: '30px', 
+            padding: '20px', 
+            border: '1px solid #e0e0e0', 
+            borderRadius: '8px', 
+            backgroundColor: '#f9f9f9',
+            display: 'inline-block' 
+          }}>
+            <p style={{color: '#555', marginBottom: '15px'}}><strong>Esta área é exclusiva para administradores.</strong></p>
+            
+            {/* Botão que leva para a página de login */}
+            <Link to="/login-adm">
+              <button style={{
+                padding: '10px 20px',
+                backgroundColor: '#0b3d91',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}>
+                Fazer Login
+              </button>
+            </Link>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  // Se estiver logado, ignora o if acima
   return (
     <div>
       <div className="breadcrumb">
@@ -226,9 +276,9 @@ function Gerenciamento() {
         <p>Cadastre, edite e exclua contratos de prestação de serviços.</p>
       </section>
 
+      {/* --- FORMULÁRIO DE CONTRATO --- */}
       <section className="crud-card">
         <h4>{idEmEdicao ? `Editando Contrato ID: ${idEmEdicao}` : 'Cadastrar Novo Contrato'}</h4>
-
         <form className="form-grid" onSubmit={salvarContrato}>
           <div className="campo-form">
             <label>Nome do Cliente</label>
@@ -273,7 +323,6 @@ function Gerenciamento() {
             <button className="btn-salvar" type="submit">
               {idEmEdicao ? 'Atualizar' : 'Salvar Cliente'}
             </button>
-
             {idEmEdicao && (
               <button className="btn-cancelar" type="button" onClick={limparFormularioContrato}>
                 Cancelar
@@ -283,9 +332,9 @@ function Gerenciamento() {
         </form>
       </section>
 
+      {/* --- TABELA DE CONTRATOS --- */}
       <section className="crud-card">
         <h4>Contratos Cadastrados</h4>
-
         <div className="tabela-wrapper">
           <table className="tabela-contratos">
             <thead>
@@ -300,7 +349,6 @@ function Gerenciamento() {
                 <th style={{ textAlign: 'center' }}>Ações</th>
               </tr>
             </thead>
-
             <tbody>
               {clientesCadastrados.length === 0 ? (
                 <tr>
@@ -355,9 +403,9 @@ function Gerenciamento() {
         </div>
       </section>
 
+      {/* --- FORMULÁRIO DE AVALIAÇÃO --- */}
       <section className="crud-card">
         <h4>{idAvaliacaoEdicao ? 'Editar Avaliação' : 'Cadastrar Avaliação de Cliente'}</h4>
-
         <form className="form-grid" onSubmit={salvarAvaliacao}>
           <div className="campo-form">
             <label>Cliente</label>
@@ -394,7 +442,6 @@ function Gerenciamento() {
             <button className="btn-salvar" type="submit">
               {idAvaliacaoEdicao ? 'Atualizar Avaliação' : 'Salvar Avaliação'}
             </button>
-
             {idAvaliacaoEdicao && (
               <button className="btn-cancelar" type="button" onClick={limparAvaliacao}>
                 Cancelar
@@ -404,6 +451,7 @@ function Gerenciamento() {
         </form>
       </section>
 
+      {/* --- SEÇÃO DE CARDS DE AVALIAÇÕES --- */}
       <section className="crud-card">
         <div className="secao-topo">
           <div>
